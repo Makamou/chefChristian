@@ -1,38 +1,35 @@
-import { useState } from "react";
-import { ChristianRecipe } from "./ChristianRecipe";
+import ReactMarkdown from "react-markdown";
 
-export function App() {
-  const [ingredients, setIngredients] = useState([]);
-  const [recipeAi, setRecipeAi] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/getRecipe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ingredients }),
-      });
-      const data = await res.json();
-      setRecipeAi(data.recipe);
-    } catch (err) {
-      console.error(err);
-      setRecipeAi("Failed to generate recipe.");
-    }
-    setLoading(false);
-  };
+export function ChristianRecipe(props) {
+  if (props.loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Generating recipe...</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Enter ingredients comma-separated"
-        onChange={(e) => setIngredients(e.target.value.split(","))}
-      />
-      <button onClick={handleSubmit}>Get Recipe</button>
+    <section>
+      <h2>Chef Christian Recommends:</h2>
 
-      <ChristianRecipe loading={loading} recipeAi={recipeAi} />
-    </div>
+      <section className="recipe-container" aria-live="polite">
+        {props.dishImage && (
+          <div className="dish-image-container">
+            <img
+              src={props.dishImage}
+              alt="Generated dish"
+              style={{
+                maxWidth: "100%",
+                borderRadius: "12px",
+                marginBottom: "1rem",
+              }}
+            />
+          </div>
+        )}
+        <ReactMarkdown>{props.recipeAi}</ReactMarkdown>
+      </section>
+    </section>
   );
 }
